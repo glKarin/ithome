@@ -1,3 +1,5 @@
+var GET_AJAX_DATA = "http://dyn.ithome.com/ithome/getajaxdata.aspx";
+
 function CloseReplay(commentid) {
         var ReplyDiv = document.getElementById('Reply' + commentid);
         ReplyDiv.style.display = 'none';
@@ -20,7 +22,7 @@ function commentFinish(msg, commentid)
         window.qml.showAlert("评论成功")
 
         var post=new XMLHttpRequest
-        post.open("POST","http://www.ithome.com/ithome/GetAjaxData.aspx")
+        post.open("POST", GET_AJAX_DATA)
         post.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
         post.onreadystatechange=function()
                 {
@@ -54,7 +56,8 @@ function commentFinish(msg, commentid)
 function pagecomment(page,num) {
     alert("点击了增加更多评论")
     var post=new XMLHttpRequest
-    post.open("POST","http://www.ithome.com/ithome/GetAjaxData.aspx")
+    post.open("POST", GET_AJAX_DATA)
+		var data = "newsID="+window.qml.mySid()+"&hash=" + window.qml._GetNewsIdHash() + "&type=commentpage&page=" + page + "&order=false";
     post.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
     post.onreadystatechange=function()
             {
@@ -65,11 +68,11 @@ function pagecomment(page,num) {
                         if(post.responseText==="")
                             window.qml.showAlert("下面没有啦")
                         else
-                            addCommentFinish(post.responseText)
+                            addCommentFinish(FixHTML(post.responseText));
                     }
                 }
             }
-    post.send("newsID="+window.qml.mySid()+"&type=commentpage&page="+page)
+    post.send(data)
     //window.qml.loadMoreComment(page)
 }
 function addCommentFinish(page)
@@ -90,7 +93,7 @@ function addCommentFinish(page)
 }
  function commentVote(commentid, typeid) {
     var post=new XMLHttpRequest
-    post.open("POST","http://www.ithome.com/ithome/postComment.aspx")
+    post.open("POST","http://dyn.ithome.com/ithome/postComment.aspx")
     post.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
     post.onreadystatechange=function()
             {
@@ -133,7 +136,7 @@ function reData(commentid,typeid,count)
 function commentComplain(commentid) {
     alert("点击了举报")
     var post=new XMLHttpRequest
-    post.open("POST","http://www.ithome.com/ithome/postComment.aspx")
+    post.open("POST","http://dyn.ithome.com/ithome/postComment.aspx")
     post.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
     post.onreadystatechange=function()
             {
@@ -149,7 +152,8 @@ function commentComplain(commentid) {
 function initHtml()
 {
     var post=new XMLHttpRequest
-    post.open("POST","http://www.ithome.com/ithome/GetAjaxData.aspx")
+    post.open("POST", GET_AJAX_DATA)
+		var data = "newsID="+window.qml.mySid()+"&hash=" + window.qml._GetNewsIdHash() + "&type=commentpage&page=1&order=false";
     post.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
     post.onreadystatechange=function()
             {
@@ -160,6 +164,7 @@ function initHtml()
                        if(post.responseText!=""){
                             var string=post.responseText
                            //alert(string)
+													 string = FixHTML(string);
                             var count=0
                             var pos=string.indexOf("class=\"entry\"")
                             while(pos>=0)
@@ -179,22 +184,27 @@ function initHtml()
                     }
                 }
             }
-    post.send("newsID="+window.qml.mySid()+"&type=commentpage&page=1")
+    post.send(data);
 }
 
 function displayCommentLouMore(commentid)//加载更多楼中楼评论
 {
     var post=new XMLHttpRequest
-    post.open("POST","http://www.ithome.com/ithome/GetAjaxData.aspx")
+    post.open("POST", GET_AJAX_DATA)
     post.setRequestHeader("Content-Type","application/x-www-form-urlencoded; charset=UTF-8");
     post.onreadystatechange=function()
             {
                 if(post.readyState===4){
                     if(post.status===200){
-                        $("#lou" + commentid).append(post.responseText).fadeIn('slow');
+                        $("#lou" + commentid).append(FixHTML(post.responseText)).fadeIn('slow');
                         $("#liGetMore" + commentid).hide();
                     }
                 }
             }
     post.send("commentid=" + commentid + "&type=getmorelou")
+}
+
+function FixHTML(text)
+{
+	return text.replace(/src='\/\//g, "src='http://").replace(/src="\/\//g, 'src="http://');
 }

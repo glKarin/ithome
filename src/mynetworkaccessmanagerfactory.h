@@ -42,6 +42,8 @@ private:
     ~NetworkCookieJar();
     void load();
     mutable QMutex mutex;
+
+		friend class NetworkAccessManager;
     //QNetworkCookie keepAliveCookie;
 };
 

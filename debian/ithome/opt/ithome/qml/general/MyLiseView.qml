@@ -70,9 +70,8 @@ ListView {
                 }
                 if(!loading)
                 {
-                    addxmlmodel.source="http://www.ithome.com/rss/"+zone+"lessthan_"+String(minnewsidData)+".xml"
-                    addxmlmodel.query="/rss/channel/item"
-                    addxmlmodel.reload()
+									pageNo++;
+                    addxmlmodel._BeginPost(zone, pageNo);
                 }
             }
 

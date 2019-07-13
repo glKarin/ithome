@@ -80,6 +80,13 @@ MyPage{
             ListElement { name: "Android专区" }
             ListElement { name: "手机" }
             ListElement { name: "数码" }
+
+						// K
+            ListElement { name: "Win10"; value: "win10"; }
+            ListElement { name: "iPad"; value: "ipad"; }
+            ListElement { name: "软件"; value: "soft"; }
+            ListElement { name: "业内资讯"; value: "it"; }
+            ListElement { name: "智能设备"; value: "next"; }
         }
         //onPrivateClicked: console.log("PrivateClicked")
         onAccepted: {
@@ -111,7 +118,10 @@ MyPage{
             case 8:
                 list.addDigiZone()
                 break
-            default:break
+								default:
+								// K
+								list._AddNewZone(main_selection_list.model.get(selectedIndex).value);
+								break
             }
         }
     }

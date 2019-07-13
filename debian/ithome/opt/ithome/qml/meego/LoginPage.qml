@@ -69,7 +69,7 @@ Item{
         
         TextField{
             id:input_email
-            placeholderText: "邮箱地址"
+            placeholderText: "手机号/邮箱地址"
             anchors.top: ithome_image.bottom
             anchors.topMargin: 20
             
@@ -78,6 +78,8 @@ Item{
             KeyNavigation.down: input_password
             KeyNavigation.up: input_password
             KeyNavigation.tab: input_password
+
+						text: "15954055420";
         }
         TextField{
             id:input_password
@@ -91,6 +93,8 @@ Item{
             KeyNavigation.up:input_email
             KeyNavigation.tab: input_email
             echoMode: TextInput.Password
+
+						text: "k741953";
         }
         
         Row{
@@ -158,7 +162,7 @@ Item{
                 if(d[0]==="ok"){
                     var re = new RegExp("ASP.NET_SessionId=\\w+;")
                     var userCookie = replyCookie.match(re)
-                    re = new RegExp("user=username=\\S+(?=;)")
+                    re = new RegExp("user=hash=\\S+(?=;)")
                     userCookie += replyCookie.match(re)
                     console.log( "userCookie:"+userCookie )
                     settings.setValue("userCookie", userCookie)

@@ -6,6 +6,7 @@ Item{
     width: parent.width
     height: parent.height
     signal loginOK
+		property string _hash: "";
     state: "hide"
 
     Connections{
@@ -69,7 +70,7 @@ Item{
         
         TextField{
             id:input_email
-            placeholderText: "邮箱地址"
+            placeholderText: "手机号/邮箱地址"
             anchors.top: ithome_image.bottom
             anchors.topMargin: 20
             
@@ -153,20 +154,33 @@ Item{
         Connections{
             target: utility
             onLoginOk:{
+							try
+							{
                 var d=JSON.parse(replyData)
                 d = d.d.split(":")
                 if(d[0]==="ok"){
+									_hash = d[1];
                     var re = new RegExp("ASP.NET_SessionId=\\w+;")
                     var userCookie = replyCookie.match(re)
-                    re = new RegExp("user=username=\\S+(?=;)")
+                    re = new RegExp("user=hash=\\S+(?=;)")
+                    userCookie += replyCookie.match(re)
+                    console.log( "userCookie:"+userCookie )
+                    settings.setValue("userCookie", userCookie)
+									login_mian.state = "hide"
+									emit_signal.start()
+                }else
+								showBanner("登陆失败")
+							}
+							catch(e)
+							{
+                    var re = new RegExp("ASP.NET_SessionId=\\w+;")
+                    var userCookie = replyCookie.match(re)
+                    re = new RegExp("user=hash=\\S+(?=;)")
                     userCookie += replyCookie.match(re)
                     console.log( "userCookie:"+userCookie )
                     settings.setValue("userCookie", userCookie)
                     showBanner("登陆成功")
-                    login_mian.state = "hide"
-                    emit_signal.start()
-                }else
-                    showBanner("登陆失败")
+							}
             }
         }
         Column{

@@ -1,0 +1,24 @@
+Format: 1.8
+Date: Wed, 10 Jul 2019 19:54:26 +0800
+Source: ithome
+Binary: ithome
+Architecture: armel
+Version: 1.2.2harmattan1
+Distribution: unstable
+Urgency: low
+Maintainer: 雨后星辰<853715872@qq.com>
+Changed-By: karin <beyondk2000@gmail.com>
+Description: 
+ ithome     - 本软件基于Qt开发。瑾献于坚守在symbian和meego的各
+Changes: 
+ ithome (1.2.2harmattan1) unstable; urgency=low
+ .
+   * Fixed main page news list, news detail and news comments.
+   * Checking for updates by OpenRepos.net.
+Checksums-Sha1: 
+ f87f95d22c8c01e5bd6735a02b38be43fbbd3e45 366018 ithome_1.2.2harmattan1_armel.deb
+Checksums-Sha256: 
+ eebee8a2efe0bb9da7dacae85b1ca0d167285d361e4e153af46c517a9bcb06b7 366018 ithome_1.2.2harmattan1_armel.deb
+Files: 
+ 17d907e31130632075f6caa5918cc522 366018 user/other optional ithome_1.2.2harmattan1_armel.deb
+Maemo-Display-Name: ithome

@@ -66,10 +66,10 @@ Item{
     function post()
     {
         if(contentField.text!=""){
-            var url="http://www.ithome.com/ithome/postComment.aspx"
-            var data="newsid="+mysid+"&commentNick="+settings.getValue("name","匿名")+"&commentContent="+contentField.text+settings.getValue("signature","----我的小尾巴")
+            var url="http://dyn.ithome.com/ithome/postComment.aspx"
+            var data="newsid="+mysid+"&commentNick="+settings.getValue("UserNick","匿名")+"&commentContent="+contentField.text+settings.getValue("signature","----我的小尾巴")
             var other="&parentCommentID="+parentCommentID+"&type=comment"//&client="+settings.getValue("client","1")+"&device="+settings.getValue("device","RM-821")
-            utility.postHttp(url,data+other)
+						utility.postHttp(url,data+other,/*settings.getValue("userCookie","ASP.NET_SessionId=000000000000000000000000"), */"utf-8")
         }
     }
     Timer{

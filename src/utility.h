@@ -32,7 +32,7 @@ public:
 //#endif
 
 public:             // Other functions.
-    Q_INVOKABLE void postHttp(const QString postUrl,const QString postData );
+    Q_INVOKABLE void postHttp(const QString postUrl,const QString postData, const QString &encode = "gb2312");
 private:
     QString queue[50];//自己写的列队,懒的用QQueue了
     int queue_begin,queue_end;//记录列队的队首和队尾
@@ -91,6 +91,9 @@ public slots:
     void setUserData( QString data, QString url="http://i.ruanmei.com/usercenter/base.aspx" );//修改用户资料
     void getCode();//获取验证码
     void registerUserGeneral( QByteArray data, QByteArray url="http://i.ruanmei.com/reg.aspx/EmailExist" );
+
+public:
+		Q_INVOKABLE void Redirect(const QString &hash);
 };
 
 #endif // UTILITY_H

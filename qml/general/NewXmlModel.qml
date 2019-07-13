@@ -1,14 +1,30 @@
 // import QtQuick 1.0 // to target S60 5th Edition or Maemo 5
 import QtQuick 1.0
 //import XmlListModel 1.0
+import "karin.js" as K
+
 AddXmlModel{
     id:xmlModel
     property string verifyKey
     query: "/rss/channel/item"
     function beginPost(url,key)
     {
-        verifyKey=key
-        source=url
+			verifyKey=key
+
+			if(["news", "favorite", "rank"].indexOf(key) === -1)
+			{
+				K.GetZoneNewsList(key, 1, function(xml){
+					xmlModel.xml = xml;
+					xmlModel.reload();
+				});
+				return;
+			}
+
+			var u = url;
+			if(key !== "favorite")
+        u = u.arg(key)
+				source = u;
+			console.log(source);
         xmlModel.reload()
     }
     onStatusChanged: {
@@ -45,9 +61,8 @@ AddXmlModel{
             }
             if(zone!="favorite"&isOneStart)
             {
-                addxmlmodel.source="http://www.ithome.com/rss/"+zone+"lessthan_"+String(minnewsidData)+".xml"
-                addxmlmodel.query="/rss/channel/item"
-                addxmlmodel.reload()
+							pageNo++;
+                addxmlmodel._BeginPost(zone, pageNo);
                 isOneStart=false
             }
             loading=false

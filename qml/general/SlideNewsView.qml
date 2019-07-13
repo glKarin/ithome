@@ -2,6 +2,7 @@
 import QtQuick 1.0
 //import myXmlListModel 1.0
 import QtWebKit 1.0
+import "karin.js" as K
 
 Item{
     id: slideNews_main
@@ -12,7 +13,7 @@ Item{
     Connections{
         target: get_slide_xml
         onAddSlideData:{
-            model.append( {"title":title, "imageSrc":image, "newsid": newsid} )
+            model.append( {"title":title, "imageSrc":image, "newsid": K.ParseNewsId(newsid)} )
         }
     }
     
@@ -59,7 +60,7 @@ Item{
             property string me_to_xml: ""//这篇新闻的xml格式的内容
             AddXmlModel{
                 id: slide_xmlmodel
-                source: "http://www.ithome.com/rss/"+newsid+".xml"
+                source: newsid ? K.API.NEWS_DETAIL_XML.arg(newsid) : "";
                 onStatusChanged: {
                     if(status==XmlListModel.Ready&&count>0)
                     {

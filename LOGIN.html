@@ -1,0 +1,102 @@
+
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head><title>
+
+</title>
+<script src="https://cdn.jsdelivr.net/npm/jquery@1.11.0/dist/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=1.0;user-scalable=no;" /></head>
+<body>
+<form method="post" action="./callback.aspx?type=web&amp;hash=1BD1B07946A7E5A981B7BB16BC42F148FAC4F1F44BF57CE776D30BEC58A32BA0B2287AC5FFCDC0D55E3B93720B9F8E24ACA2CCBC40929613E56EC9214E20F502DDA3574ABE08BBD25392AA68702E7C9E13D2881A8BB116441744771DDBCF0170D24A2A69DA8EA76502D6176A79B590043CBA749C91BA392F" id="form1">
+	<div class="aspNetHidden">
+		<input type="hidden" name="__VIEWSTATE" id="__VIEWSTATE" value="/wEPDwUJNjI2MjY0OTg0ZGQIfl90M8dU9hoDpJyZk2MWwogQ5m5pvjGfTbPvG8NSvg==" />
+	</div>
+
+	<div class="aspNetHidden">
+
+		<input type="hidden" name="__VIEWSTATEGENERATOR" id="__VIEWSTATEGENERATOR" value="79DCA7D8" />
+	</div>
+	<div>
+		<script>
+var hash = GetQueryString("hash");
+var type = GetQueryString("type");//wxãqqãsina
+if (null != hash && "" != hash) {
+
+	//ç»å½ITä¹å®¶
+	var ithomeLoginFinish = false;
+	var ithomeLoginUrl = "https://dyn.ithome.com/openplat/callback?type=qq&hash=" + hash;
+	if ("sina" == type) {
+		ithomeLoginUrl = "http://www.ithome.com/ithome/openplat/sina/callback.aspx?hash=" + hash;
+	}
+	createHiddenIFrameElement(ithomeLoginUrl, function () {
+			ithomeLoginFinish = true;
+			});
+	//$.getScript(ithomeLoginUrl, function () {
+	//    ithomeLoginFinish = true
+	//});
+
+	//ç»å½è¾£åï¼ç±äºè¾£åææ¶å·²ç»å±è½ç»å½ï¼æ­¤é¨ååä¸åäºï¼
+	//var lapinLoginFinish = false;
+	//var lapinLoginUrl = "http://lapin365.com/Login/logincallback?hash=" + hash;
+	//createHiddenIFrameElement(lapinLoginUrl, function () {
+	//    lapinLoginFinish = true;
+	//});
+	//$.getScript(lapinLoginUrl, function () {
+	//    lapinLoginFinish = true
+	//});
+
+	//ç»å½ITåï¼æªå®æ
+	//var itquanLoginFinish = false;
+	//var itquanLoginUrl = "http://quan.ithome.com/ithome/openplat/qq/callback.aspx?hash=" + hash;
+
+
+	//è¶æ¶æ¶é´åç»å½å®æçå¤æ­
+	var timeOut = 5000;
+	var timespan = 200;
+	var timer = setInterval(function () {
+			if (ithomeLoginFinish){
+			clearInterval(timer);
+			window.close();
+			}
+			timeOut -= timespan;
+			if (timeOut <= 0) {
+			clearInterval(timer);
+			window.close();
+			}
+			}, timespan, null);
+}
+
+function GetQueryString(name) {
+	var reg = new RegExp("(^|&)" + name + "=([^&]*)(&|$)");
+	var r = window.location.search.substr(1).match(reg);
+	if (r != null)
+		return unescape(r[2]);
+	return null;
+}
+
+//å»ºä¸ä¸ªéèçiframe
+function createHiddenIFrameElement(url, onload) {
+	var iframe = document.createElement("iframe");
+	//iframe.setAttribute("style", "display:none;");
+	iframe.setAttribute("width", "1");
+	iframe.setAttribute("height", "1");
+	document.body.appendChild(iframe);
+	if (null != onload) {
+		iframe.onload = iframe.onreadystatechange = function () {
+			if (this.readyState && this.readyState != 'complete')
+				return;
+			else {
+				onload();
+			}
+		};
+	}
+	iframe.setAttribute("src",url);
+	return iframe;
+}
+		</script>
+	</div>
+</form>
+</body>
+</html>

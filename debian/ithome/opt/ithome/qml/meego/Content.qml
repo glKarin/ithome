@@ -37,6 +37,7 @@ MyPage{
             iconId: "toolbar-edit"
             opacity: night_mode?brilliance_control:1
             onClicked: {
+							//showBanner("发布评论暂不可用"); return;
                 comment.show()//
                 //loading=false
                 //page.pageStack.push(Qt.resolvedUrl("MyComment.qml"),{mysid: String(mysid)})
@@ -46,6 +47,7 @@ MyPage{
             opacity: night_mode?brilliance_control:1
             iconSource: night_mode?"qrc:/Image/comment2_meego.svg":"qrc:/Image/comment_meego.svg"
             onClicked: {
+							//showBanner("查看评论暂不可用"); return;
                 current_page="comment"
                 page.pageStack.push(Qt.resolvedUrl("CommentPage.qml"),{mysid: String(mysid)})
             }

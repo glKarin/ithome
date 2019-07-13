@@ -30,6 +30,11 @@ contains(MEEGO_EDITION, harmattan){
     DEPLOYMENTFOLDERS += folder_01
     DEFINES += Q_OS_HARMATTAN
 
+		DEFINES += _HARMATTAN
+		#DEFINES += _DBG
+		OBJECTS_DIR = .obj
+		MOC_DIR = .moc
+
     splash.files = Image/MeeGo.png
     splash.path = /opt/ithome/data
 
@@ -69,6 +74,12 @@ symbian:{
     TARGET.UID3 = 0xE274BCB6
     TARGET.CAPABILITY += NetworkServices
     RESOURCES += symbian.qrc
+
+    my_deployment.pkg_prerules += vendorinfo
+
+    DEPLOYMENT += my_deployment
+
+    vendorinfo += "%{\"zccrs\"}" ":\"zccrs\""
 }
 
 

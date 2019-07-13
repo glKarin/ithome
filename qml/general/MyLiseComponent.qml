@@ -1,5 +1,6 @@
 // import QtQuick 1.0 // to target S60 5th Edition or Maemo 5
 import QtQuick 1.0
+import "karin.js" as K
 
 Rectangle {
     id:root
@@ -163,43 +164,80 @@ Rectangle {
         enabled: allowMouse&!isHighlight
         anchors.fill: titletext
         onClicked: {
+						var s = function(d, ns, na){
+							main.current_page="content"
+							yiyue.visible=true//显示已经阅读
+							settings.setValue("titleTextClock"+String(newsid),true)
+
+							//console.log("utility.imageIsShow="+utility.imageIsShow("contentImage"+String(newsid)))
+							if((no_show_image|isWifi&wifiStatus===-1)&!utility.imageIsShow("contentImage"+String(newsid))){
+								var contentData={
+									mysid:newsid,
+									title:title,
+									myurl:m_url,
+									postdate:postdate,
+									newsauthor:na !== undefined ? na : newsauthor,
+									newssource:ns !== undefined ? ns : newssource,
+									allowDoubleClick:true,
+									url:sysIsSymbian_v3?(d !== undefined ? d : detail):cacheContent.getContent_noImageModel(newsid),
+									me_to_xml:root.me_to_xml//这篇新闻的xml格式的内容
+								}
+							}
+							else{
+								loading=true
+								//console.log("contentSrc is:"+contentSrc)
+								contentData={
+									mysid:newsid,
+									title:title,
+									myurl:m_url,
+									postdate:postdate,
+									newsauthor:na !== undefined ? na : newsauthor,
+									newssource:ns !== undefined ? ns : newssource,
+									url:sysIsSymbian_v3?(d !== undefined ? d : detail):cacheContent.getContent_noImageModel(newsid),
+									me_to_xml:root.me_to_xml//这篇新闻的xml格式的内容
+								}
+							}
+							page.loadContent(contentData)
+						};
+
             if(cacheContent.getContent_noImageModel(newsid)==="-1"|sysIsSymbian_v3){
                 //cacheContent.saveTitle(newsid,title)
-                cacheContent.saveContent(newsid,detail)
+								if(detail)
+								{
+									cacheContent.saveContent(newsid, detail);
+									if(newsauthor && newssource) s();
+									else
+									{
+										K.GetNewsDetail(m_url || newsid, function(xml){
+											var n_newsauthor = K.getElementsByTagName(xml, "newsauthor")[0].firstChild.nodeValue;
+											var n_newssource = K.getElementsByTagName(xml, "newssource")[0].firstChild.nodeValue;
+											s(undefined, n_newssource, n_newsauthor);
+										});
+									}
+								}
+								else
+								{
+									K.GetNewsDetail(m_url || newsid, function(xml){
+										var n_detail = K.getElementsByTagName(xml, "detail")[0].firstChild.nodeValue;
+										var n_newsauthor = K.getElementsByTagName(xml, "newsauthor")[0].firstChild.nodeValue;
+										var n_newssource = K.getElementsByTagName(xml, "newssource")[0].firstChild.nodeValue;
+										cacheContent.saveContent(newsid, n_detail);
+										s(n_detail, n_newssource, n_newsauthor);
+									});
+								}
             }
-            main.current_page="content"
-            yiyue.visible=true//显示已经阅读
-            settings.setValue("titleTextClock"+String(newsid),true)
-
-            //console.log("utility.imageIsShow="+utility.imageIsShow("contentImage"+String(newsid)))
-            if((no_show_image|isWifi&wifiStatus===-1)&!utility.imageIsShow("contentImage"+String(newsid))){
-                var contentData={
-                    mysid:newsid,
-                    title:title,
-                    myurl:m_url,
-                    postdate:postdate,
-                    newsauthor:newsauthor,
-                    newssource:newssource,
-                    allowDoubleClick:true,
-                    url:sysIsSymbian_v3?detail:cacheContent.getContent_noImageModel(newsid),
-                    me_to_xml:root.me_to_xml//这篇新闻的xml格式的内容
-                }
-            }
-            else{
-                loading=true
-                //console.log("contentSrc is:"+contentSrc)
-                contentData={
-                    mysid:newsid,
-                    title:title,
-                    myurl:m_url,
-                    postdate:postdate,
-                    newsauthor:newsauthor,
-                    newssource:newssource,
-                    url:sysIsSymbian_v3?detail:cacheContent.getContent_noImageModel(newsid),
-                    me_to_xml:root.me_to_xml//这篇新闻的xml格式的内容
-                }
-            }
-            page.loadContent(contentData)
+						else
+						{
+							if(newsauthor && newssource) s();
+							else
+							{
+								K.GetNewsDetail(m_url || newsid, function(xml){
+									var n_newsauthor = K.getElementsByTagName(xml, "newsauthor")[0].firstChild.nodeValue;
+									var n_newssource = K.getElementsByTagName(xml, "newssource")[0].firstChild.nodeValue;
+									s(undefined, n_newssource, n_newsauthor);
+								});
+							}
+						}
         }
     }
     

@@ -4,6 +4,8 @@ import com.nokia.meego 1.1
 import QtMobility.systeminfo 1.2
 import com.nokia.extras 1.1
 import "../general"
+import "../general/karin.js" as K
+
 MyPage{
     id:set_page
     clip:true
@@ -31,6 +33,8 @@ MyPage{
             opacity: night_mode?brilliance_control:1
             iconSource: night_mode?"qrc:/Image/userCenter_meego.png" : "qrc:/Image/userCenter_meego_inverse.png"
             onClicked: {
+							//showBanner("登录功能暂不可用"); return;
+
                 pageStack.push(Qt.resolvedUrl("UserCenter.qml"))
             }
         }
@@ -421,13 +425,62 @@ MyPage{
             width: parent.width*0.6
             //height: width
             Component.onCompleted: {
+							_CheckForUpdates(); return;
+
                 if( settings.getValue( "auto_updata_app", 1 )==1 )
                     checkForUpdates_http.post("GET","http://www.9smart.cn/app/checkversion?appid=7")
             }
 
             onClicked: {
+							_CheckForUpdates(true); return;
+
                 checkForUpdates_http.post("GET","http://www.9smart.cn/app/checkversion?appid=7")
             }
+
+						function _CheckForUpdates(a)
+						{
+							var showmsg_f = function(msg){
+								if(a) showBanner(msg);
+								console.log(msg);
+							};
+							K.CheckForUpdates(K.OPENREPOS_APPID, function(data){
+								if(!data.package_name && !data.package_version) // downed
+								{
+									showmsg_f("该应用已下架, 详情请联系上传者.");
+									return;
+								}
+								if(data.package_name !== K.PKG)
+								{
+									showmsg_f("该应用尚未上传至OpenRepos.");
+									return;
+								}
+
+								var v = K.VER;
+								var o = data.package_version.substring(0, v.length);
+								var u = o.localeCompare(v);
+								console.log(v, o, u);
+								if(u === 0)
+								{
+									showmsg_f("应用版本已为最新.");
+								}
+								else if(u < 0)
+								{
+									showmsg_f("安装版本比OpenRepos较新. 可能是你已从其他源进行安装, 或者可能是开发者未上传最新版本.");
+								}
+								else // update
+								{
+									var texts = ""
+									+ "版本: " + data.package_version + " "
+									+ "发布日期: " + Qt.formatDateTime(new Date(data.updated * 1000), "yyyy-MM-dd hh:mm:ss") + "\n"
+									+ "更新日志: " + data.changelog + " "
+									+ "上传者: " + data.user_name + " "
+									+ "下载量: " + data.download;
+									utility.setClipboard(data._url);
+									showBanner("应用有更新可用. " + texts + "\n下载地址已经复制到剪切板. 正在打开应用页面...");
+									Qt.openUrlExternally(data._url);
+								}
+							});
+						}
         }
     }
     onStatusChanged: {

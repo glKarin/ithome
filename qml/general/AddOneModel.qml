@@ -1,6 +1,8 @@
 // import QtQuick 1.0 // to target S60 5th Edition or Maemo 5
 import QtQuick 1.0
 //import XmlListModel 1.0
+import "karin.js" as K
+
 AddXmlModel{
     id:addonemodel
     property int poss: -1;
@@ -13,7 +15,7 @@ AddXmlModel{
         //console.log("addone model sid is:"+temp)
         if(temp!="null")
         {
-            addonemodel.source="http://www.ithome.com/rss/"+temp+".xml"
+            addonemodel.source=K.API.NEWS_DETAIL_XML.arg(temp);
             reload()
         }
         else {

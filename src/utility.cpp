@@ -56,13 +56,15 @@ void Utility::imageToShow(const QString name)
 }
 
 
-void Utility::postHttp(const QString postUrl,const QString postData)
+void Utility::postHttp(const QString postUrl,const QString postData, const QString &e)
 {
-    QTextCodec *codec = QTextCodec::codecForName("gb2312");
+	QByteArray encode;
+	encode.append(e);
+    QTextCodec *codec = QTextCodec::codecForName(encode);
     QByteArray array=codec->fromUnicode(postData);
     QNetworkRequest request;
     request.setUrl(QUrl(postUrl));
-    request.setRawHeader("Content-Type","application/x-www-form-urlencoded;charset=gb2312");/*设置http请求头，不然塞班真机会出现问题*/
+    request.setRawHeader("Content-Type","application/x-www-form-urlencoded;charset=" + encode);/*设置http请求头，不然塞班真机会出现问题*/
     request.setRawHeader ("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.66 Safari/537.36 LBBROWSER");
     request.setRawHeader ("Cookie", settings.getValue ("userCookie","").toByteArray ());
     manager->post(request,array);
@@ -71,7 +73,9 @@ void Utility::replyFinished(QNetworkReply *replys)
 {
     if(replys->error() == QNetworkReply::NoError)
     {
-        QTextCodec *codec = QTextCodec::codecForName("gb2312");
+			QByteArray encode = replys->rawHeader ("Content-Type");
+			encode = encode.mid(encode.indexOf("charset=") + 8);
+        QTextCodec *codec = QTextCodec::codecForName(encode);
         QString string=codec->toUnicode(replys->readAll());
         emit postOk(string);
     }
@@ -83,6 +87,7 @@ void Utility::loginFinished(QNetworkReply *replys)
     {
         QString string=replys->readAll();
         QString cookie_temp = replys->rawHeader ("Set-Cookie");
+				//qDebug()<<string<<cookie_temp;
         
         replys->manager ()->deleteLater ();//销毁这个对象
         emit loginOk (string, cookie_temp);
@@ -502,11 +507,14 @@ bool Utility::getFavoriteIsNull()
 
 void Utility::login(QByteArray useremail, QByteArray password)
 {
+	const QString _Url("http://my.ruanmei.com/Default.aspx/LoginUser");
+	const QByteArray _Remeberme(", \"rememberme\": \"true\"");
     settings.setValue ("useremail", useremail);
     settings.setValue ("password", password);
-    QByteArray array="{ \"username\":\""+useremail+"\", \"password\":\""+password+"\"  }";
+    QByteArray array="{ \"mail\":\""+useremail+"\", \"psw\":\""+password+"\" " + _Remeberme + " }";
     QNetworkRequest request;
-    request.setUrl (QUrl("http://www.ithome.com/ithome/login.aspx/btnLogin_Click"));
+    //request.setUrl (QUrl("http://dyn.ithome.com/ithome/login.aspx/btnLogin_Click"));
+    request.setUrl (QUrl(_Url));
     request.setRawHeader("Content-Type","application/json;charset=UTF-8");
     request.setRawHeader ("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.66 Safari/537.36 LBBROWSER");
     QNetworkAccessManager *manager_temp = new QNetworkAccessManager(this);
@@ -585,3 +593,17 @@ Utility::~Utility()
 {
     manager->deleteLater();
 }
+
+void Utility::Redirect(const QString &hash)
+{
+	//const QString _Url("http://my.ruanmei.com/openplat/callback.aspx?type=web&hash=" + hash);
+	const QString ithomeLoginUrl = "http://dyn.ithome.com/openplat/callback?type=qq&hash=" + hash;
+    QNetworkRequest request;
+    request.setUrl (QUrl(ithomeLoginUrl));
+    request.setRawHeader("Content-Type","application/json;charset=UTF-8");
+    request.setRawHeader ("User-Agent", "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/29.0.1547.66 Safari/537.36 LBBROWSER");
+    QNetworkAccessManager *manager_temp = new QNetworkAccessManager(this);
+    connect(manager_temp, SIGNAL(finished(QNetworkReply*)),this, SLOT(loginFinished(QNetworkReply*)));
+    manager_temp->get(request);
+}
+

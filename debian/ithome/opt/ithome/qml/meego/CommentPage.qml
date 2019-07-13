@@ -2,6 +2,8 @@
 import QtQuick 1.1
 import com.nokia.meego 1.1
 import QtWebKit 1.0
+import "../general/karin.js" as K
+
 MyPage {
     id:commentpage
     property string mysid: ""
@@ -71,7 +73,7 @@ MyPage {
         }
         WebView{
             id:web
-            url:"../general/comment.html"
+            //k url:"../general/comment.html"
             visible: false
             opacity: night_mode?brilliance_control:1
             settings.javascriptEnabled: true
@@ -91,6 +93,11 @@ MyPage {
 
             javaScriptWindowObjects: QtObject{
                 WebView.windowObjectName: "qml"
+								function _Debug(msg) { console.log(msg); }
+								function _GetNewsIdHash()
+								{
+									return commentpage._pagetype;
+								}
                 function mySid()
                 {
                     utility.consoleLog("html索取了新闻id")
@@ -146,5 +153,52 @@ MyPage {
             web.commentFinish(msg)
         }
     }
+		WebView{
+			id: origwebview;
+			anchors.bottom: parent.bottom;
+			anchors.right: parent.right;
+			z: -999;
+			width: 0;
+			height: 0;
+			visible: false;
+			settings.autoLoadImages: false;
+			onLoadFinished: {
+				if(_CommentIFrameId)
+				{
+					var script = "(function(){ return pagetype; })()";
+					var pagetype = evaluateJavaScript(script);
+					_pagetype = pagetype;
+					loading = false;
+					console.log("6) Hash is " + pagetype);
+					console.log("7) Go to comment page.");
+          web.url = "../general/comment.html";
+				}
+				else
+				{
+					var script = "(function(){ var iframe = document.getElementById('ifcomment'); var cid = iframe.getAttribute('data'); return cid; })()";
+					var cid = evaluateJavaScript(script);
+					_CommentIFrameId = cid;
+					console.log("4) Comment iframe ID is " + cid);
+					console.log("5) Getting hash...");
+					showBanner("正在获取新闻哈希码...");
+					origwebview.url = "http://dyn.ithome.com/comment/" + _CommentIFrameId;
+				}
+			}
+		}
+		property string _pagetype: "";
+		property string _CommentIFrameId: "";
+		onMysidChanged: {
+			showBanner("正在获取评论信息, 请稍等.");
+			web.url = "";
+			_pagetype = "";
+			_CommentIFrameId = "";
+			console.log("1) Getting news url of desktop version...");
+			loading=true;
+			K.GetNewsUrl(mysid, function(url){
+				origwebview.url = url;
+				console.log("2) Desktop version url is " + url);
+				console.log("3) Getting comment iframe ID...");
+			});
+		}
     Component.onCompleted: main.setCssToComment()//设置css
 }

@@ -53,6 +53,9 @@ MyPage{
             opacity: main.night_mode?main.brilliance_control:1
             
             onClicked: {
+							showBanner("修改个人信息暂不支持");
+							return; // FIXME
+
                 if( user_true_name.mode == "edit" ){
                     var data = "__EVENTTARGET=&__EVENTARGUMENT=&__VIEWSTATE=%2FwEPDwUKMTQ1Mzg5Nzc2MQ9kFgJmD2QWAgIBD2QWAgICD2QWAgIIDxYCHglpbm5lcmh0bWxlZGReoQH7UiHT2P2nqMisiej3f96AuKLPfz9EBEKE%2B2QqLw%3D%3D&__EVENTVALIDATION=%2FwEdAAhT5F4vm7P3tNcHedxJSjaMetmnXCW78O8MOJUYt92SyUcghoZlg4McPsTc5dJh%2Ff%2BBeqgcP63cVNe6lUeEH7C5fbO357WlOQ3%2B%2BBTljekIycm4Dg4her8nMjNi%2FZ4apy1Dal2hKqI4Cqrg8JhZwKxbvTZ68U7SSOrbXpD7C2zYuiSMw80XjnKN3CenaR5UWip1az5NpYFyCEQvUqqmVU9H&"+
                             "ctl00$MainContent$txtUserNick="+user_nick_input.text+
@@ -130,8 +133,8 @@ MyPage{
             }
             function setAccountInfo(string)
             {
-                var re = new RegExp("\\w+@\\S+")
-                var temp1 = string.match(re)
+                var re = new RegExp("(\\w+)@\\S+")
+                var temp1 = string.match(re)[1];
                 
                 re = new RegExp("数字ID：(\\d+)")
                 re = string.match(re)[1]
@@ -175,6 +178,7 @@ MyPage{
             function setUserLevel(number)
             {
                 utility.consoleLog("用户等级是："+number)
+								number = number.match(/lv\.? ?(\d+)/i)[1];
                 settings.setValue("UserLevel",number)
                 level_text.text = "LV"+number
             }
@@ -182,16 +186,16 @@ MyPage{
         
         onLoadFinished: {
             evaluateJavaScript(
-                        'window.qml.setAvatarSrc($(".face img:first").attr("src"));'+
-                        'window.qml.setLevelState($(".level_state").html());'+
+                        'window.qml.setAvatarSrc("http:" + $("img.avatar:first").attr("src"));'+
+												'window.qml.setLevelState($(".level-state").html() + "<br>" + $(".level-state.left-days").html());'+
                         'window.qml.setDayState($(".oth_info").text());'+
-                        'window.qml.setAccountInfo($(".t_name:eq(0)").text()+$(".t_con:eq(0)").text());'+
+                        'window.qml.setAccountInfo($(".header-nick").text()+ "@" + $(".detail-tail").text());'+
                         'window.qml.setUserNick($("#MainContent_txtUserNick").val());'+
-                        'window.qml.setTrueName($("#MainContent_txtTruename").val());'+
+                        'window.qml.setTrueName($("#MainContent_txtTrueName").val());'+
                         'window.qml.setUserQQ($("#MainContent_txtQQ").val());'+
                         'window.qml.setUserPhone($("#MainContent_txtPhone").val());'+
                         'window.qml.setUserAddress($("#MainContent_txtAddress").val());'+
-                        'window.qml.setUserLevel($(".lv_numb").text());'
+                        'window.qml.setUserLevel($(".level-number").text());'
                         )
         }
         onAlert: {
@@ -220,7 +224,7 @@ MyPage{
         Image{
             id:user_avatar
             cache: false
-            source: "/home/developer/.ithome/cache/avatar.jpg"
+            source: "/home/user/.ithome/cache/avatar.jpg"
             anchors.top: parent.top
             anchors.topMargin: 20
             anchors.left: parent.left
@@ -285,13 +289,25 @@ MyPage{
             font.pixelSize: 22
             anchors.left: user_nick.left
             anchors.bottom: user_avatar.bottom
+						anchors.right: parent.right;
+						/*
+						horizontalAlignment: Text.AlignRight;
+						verticalAlignment: Text.AlignBottom;
+						*/
+					 onTextChanged: {
+						 if(level_state.text.indexOf("\n") !== -1) 
+						 {
+							 level_state.text = level_state.text.replace(/\n/g, " ");
+							 console.log("remove EOL");
+						 }
+					 }
         }
         
         Connections{
             target: cacheContent
             onImageDownloadFinish:{
                 user_avatar.source=""
-                user_avatar.source = "/home/developer/.ithome/cache/avatar.jpg"
+                user_avatar.source = "/home/user/.ithome/cache/avatar.jpg"
             }
         }
         Text {

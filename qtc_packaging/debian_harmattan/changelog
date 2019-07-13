@@ -1,3 +1,10 @@
+ithome (1.2.2harmattan1) unstable; urgency=low
+
+  * Fixed main page news list, news detail and news comments.
+  * Checking for updates by OpenRepos.net.
+
+ -- karin <beyondk2000@gmail.com>  Wed, 10 Jul 2019 19:54:26 +0800
+
 ithome (1.2.2) unstable; urgency=low
   * <更新新闻分类（新增windows专区、phone专区、数码专区）
      修复楼中楼无法回复的问题

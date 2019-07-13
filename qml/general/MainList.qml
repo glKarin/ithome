@@ -2,6 +2,8 @@
 import QtQuick 1.0
 //import XmlListModel 1.0
 import "post_http.js" as PostHttp
+import "karin.js" as K
+
 Item {//
     id:mainlist
     anchors.fill: parent
@@ -19,6 +21,8 @@ Item {//
     property string monthRank:"/rss/channelmonthrank/item"//排行榜中一月内最热门
     property string ranktype: doubleDayRank
     property int addListViewCount: 0//记录新增列表视图的数量
+
+		property int pageNo: 1;
 
     signal buttonPress(int keysid);
     onButtonPress: {
@@ -78,7 +82,7 @@ Item {//
                 maxnewsidData=0
                 minnewsidData=99999999
                 listmodel.clear()
-                xmlModel.beginPost("http://www.ithome.com/rss/news.xml",zone)//获取最新资讯
+                xmlModel.beginPost(K.API.NEWSLIST,zone)//获取最新资讯
             }
             else{
                 addListViewCount=maxsid-maxnewsidData
@@ -96,8 +100,8 @@ Item {//
         switch (zone)
         {
         case "news":
-            loading=true
-            PostHttp.postBegin(mainlist,"GET","http://www.ithome.com/rss/maxnewsid.xml","")
+            //k loading=true
+            //k PostHttp.postBegin(mainlist,"GET","http://www.ithome.com/rss/maxnewsid.xml","")
             break
         case "rank":
             zone=""
@@ -127,7 +131,9 @@ Item {//
             zone=""
             addDigiZone()
             break
-        default:break
+						default:
+						_AddNewZone(zone);
+						break
         }
     }
 
@@ -135,9 +141,10 @@ Item {//
     {
         listmodel.clear()
         isOneStart=true
+				pageNo = 1;
         maxnewsidData=0
         minnewsidData=99999999
-        xmlModel.beginPost("http://www.ithome.com/rss/"+zone+".xml",key)
+        xmlModel.beginPost(K.API.NEWSLIST,key)
     }
     function addFavoriteZone()
     {
@@ -151,6 +158,7 @@ Item {//
             stateText.text="收藏夹"
             listmodel.clear()
             isOneStart=true
+						pageNo = 1;
             maxnewsidData=0
             minnewsidData=99999999
             var favoritePath=sysIsSymbian?("D:/ithome/like.xml"):"/home/user/.ithome/like.xml"
@@ -170,6 +178,7 @@ Item {//
             zone="rank"
             stateText.text="排行榜"
             isOneStart=true
+						pageNo = 1;
             maxnewsidData=0
             minnewsidData=99999999
             listmodel.clear()
@@ -220,6 +229,22 @@ Item {//
             postNewModel(zone)
         }
     }
+
+		function _AddNewZone(z)
+		{
+			if(z === "favorite") return;
+
+			var Zones = {
+				win10: "Win10",
+				ipad: "iPad",
+				soft: "软件",
+				it: "业内资讯",
+				next: "智能设备",
+			};
+			zone = z;
+			stateText.text = Zones[z];
+			postNewModel(zone);
+		}
 
     Image{
         id:pageheader
@@ -357,6 +382,6 @@ Item {//
     
     Component.onCompleted: {
         addListViewCount=20
-        xmlModel.beginPost("http://www.ithome.com/rss/news.xml",zone)//如果有网络就加载新闻
+        xmlModel.beginPost(K.API.NEWSLIST,zone)//如果有网络就加载新闻
     }
 }

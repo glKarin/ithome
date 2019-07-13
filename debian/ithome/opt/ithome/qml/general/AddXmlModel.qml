@@ -2,6 +2,8 @@
 import QtQuick 1.0
 //import myXmlListModel 1.0
 import QtWebKit 1.0
+import "karin.js" as K
+
 XmlListModel{
     id:addxmlmodel
     query:"/rss/channel/item"
@@ -16,4 +18,13 @@ XmlListModel{
     XmlRole { name: "postdate"; query: "postdate/string()" }//时间
     XmlRole { name: "newssource"; query: "newssource/string()" }//文章来源
     XmlRole { name: "newsauthor"; query: "newsauthor/string()" }//发布者
+
+    function _BeginPost(zone, pn)
+    {
+			K.GetZoneNewsList(zone === "news" ? "" : zone, pn, function(xml){
+				addxmlmodel.xml = xml;
+				addxmlmodel.reload();
+			});
+			return;
+    }
 }
